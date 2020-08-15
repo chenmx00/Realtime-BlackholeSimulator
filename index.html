@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>Final Deliverable: </title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Summer 2020</h1>
+<h1 align="middle">Final Deliverable: Blackhole Simulation using Ray Marching</h1>
+<h2 align="middle">Minxing Chen, CS184-aba</h2>
+
+<br><br>
+
+<div>
+
+<h2 align="middle">Overview</h2>
+<p>Inspired by the blackhole "Gargantua" in the film Interstellar, I built this real-time rendered blackhole using GLSL and C++. Since the blackhole is a form of extreme body in the universe, the light will behave oddily arounded the blackhole, I used ray marching approach to simulate the lighting condition around the blackhole.</p>
+<p>There are mainly four parts in the real-time blackhole system I am building. They are </p>
+  <p>I). Pseudo-Riemannian manifold optics.</p>
+  <p>II). Ray Marching. </p>
+  <p>III). The camera system</p>
+
+  <td align="middle">
+    <img src="img/gargantua.png" width="960px" />
+    <figcaption align = "middle">Gargantua in Interstellar</figcaption>
+    </tr>
+
+<h2 align="middle">Part I: The Pseudo-Riemannian manifold optics</h2>
+In 1915, Albert Einstein proposed the general relativity, and one of its most important equations - Einstein field equations - suggested that mass and enery will bent the spacetime and therefore yielding gravitational forces. Thus, since the blackhole has enormous mass, it will generate gigantic gravitational field and even light is bent when it travels towards the observer. This will generate a Pseudo-Riemannian manifold optics, which is also called gravitational lensing. 
+<td align="middle">
+  <img src="img/schwartzchild.png" width="960px" />
+  <figcaption align = "middle">The Schwarzschild Blackhole with zero charge and angular momentum</figcaption>
+  </tr>
+  
+From the equation of a standard Schwarzschild metric, we can derive to a second order equation in the newtonian metrics.
+<td align="middle">
+<img src="img/newton.png" width="960px" />
+<figcaption align = "middle">The energy conservation equation in the newtonian mechanical system where LHS = Kinetic energy and LHS = minus potential</figcaption>
+</tr>
+
+Now, given initial conditions of lights, after turn them into (u, u'') format, we can numerically intergrate the differential equation using Runge-Kutta method(rk4f in my implementation). It will outputs the full set of light rays  passing around the blackhole in the u(ɸ). <form action="" class=""></form>
+<td align="middle">
+  <img src="img/ring.JPG" width="960px" />
+  <figcaption align = "middle">The Einstein ring simulated in my rendering.</figcaption>
+  </tr>  
+
+
+
+</tr>
+
+<h2 align="middle">Part II: Raymarching. </h2>
+<p>Since the light ray is bent in this special case, the light might actually circle around the blackhole multiple times. (One can view the entire sphere of the event horizon from any observing angle, that means one can view the north pole and south pole of the event horizon at the same time because the light is bent.)Therefore, a traditional ray tracing approach is not appliable. To solve this problem, we introduced the Ray Marching approach. </p>
+<p>In Ray Marching approach, within each iteration, the light will work like a "probe", take a small step through a scence until it intersects objects. Ray Marching allows us to use numerical intergration to model the path of the light. Along that path, one can test for intersection with the accretion disk and the event horizon of the blackhole. The event horizon is a "black" disk around the center of the blackhole. If there is light ever enter the event horizon (depends on the radius of the blackhole), it will never escape, that's why blackhole is called "blackhole". If the light is not collided with any thing throughout our simulation, we can simply sample from the background texture. </p>
+
+<td align="middle">
+<img src="img/raymarching.png" width="960px" />
+<figcaption align = "middle">Ray Marching</figcaption>
+</tr>
+
+
+<h2 align="middle">Part III: the camera system and Miscellaneous</h2>
+
+<p>This part is comparatively straightfawrd. Thanks for GLUT framework, I am able to bootstrap the GUI system. Everytime when there's an external input from the keyboard, an update function will be called within the display function which is fed into glutDisplayFunc. Within the update, the position of the camera system will be recalculated based on the input value through transformation matrices.</p>
+<P>Besides the camera system, I also used an existing CGLShader which already encapusaled a GLSL shading pipeline. Thus I am able to easily use GPU to accelerate the real-time rendering.</P>
+
+
+<h2 align="middle">Conclusion</h2>
+<p>In this project, I learned a lot graphics knowledge that related to CS184 or even knowledge that went beyond it. Especially those hands-on knowledge such as using frameworks and shaders in real life. My original goal is implementing a real-time raytracing blackhole that has accretion disk and bloom post processing effects. Due to time constrain I didn't incorporate those functionalites in this submission, but I will continue work on those funtions and eventually present a more physically accurate blackhole. Besides, throughout my researching and developing, I realized that redshift is usually ignored in most exisiting raymarching blackhole simulations and shaders. I will probably add this feature in the future version too.(Also I will proabably use metal to rewrite the simulator and migrate it to VR platfrom so that people an view how light is bent more intuitively.)
+  <td align="middle">
+    <img src="img/Ideal.png" width="960px" />
+    <figcaption align = "middle">Ideal rendering effect</figcaption>
+    </tr>  
+  
+  
+  
+  </tr>
+
+<h2 align="middle">References</h2>
+<P>Scientific models #1: http://rantonels.github.io/starless/</P>
+<P>Scientific models #2: http://spiro.fisica.unipd.it/~antonell/schwarzschild/</P>
+<p>Shadertoy bloom effect: https://www.shadertoy.com/view/lstSRS</p>
+<h2 align="middle">Contribution</h2>
+<P>Minxing Chen: Writing proposal, Researching, Code Implemention, Presentation.</P>
+
+
+</body>
+</html>
